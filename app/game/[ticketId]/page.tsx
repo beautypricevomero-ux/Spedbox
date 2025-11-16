@@ -3,10 +3,11 @@
 import { LayoutShell } from "@/components/LayoutShell";
 import { ProductCard } from "@/components/ProductCard";
 import { FloatingActions } from "@/components/FloatingActions";
-import { TimerCircle } from "@/components/TimerCircle";
+import { TimerPill } from "@/components/TimerPill";
+import { BottomNav } from "@/components/BottomNav";
 import { useSpeedBoxStore } from "@/lib/store";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 export default function GamePage() {
   const params = useParams();
@@ -16,78 +17,89 @@ export default function GamePage() {
   const {
     currentTicket,
     currentProduct,
-    productSequence,
-    currentProductIndex,
-    remainingSeconds,
     selectedProducts,
-    isRunning,
-    currentSession,
+    remainingSeconds,
+    startSession,
     handleAdd,
     handleSkip,
     tick,
-    startSession,
-  } = useSpeedBoxStore((s) => ({
-    currentTicket: s.currentTicket,
-    currentProduct: s.currentProduct,
-    productSequence: s.productSequence,
-    remainingSeconds: s.remainingSeconds,
-    selectedProducts: s.selectedProducts,
-    isRunning: s.isRunning,
-    currentSession: s.currentSession,
-    handleAdd: s.handleAdd,
-    handleSkip: s.handleSkip,
-    tick: s.tick,
-    startSession: s.startSession,
-    currentProductIndex: s.currentProductIndex,
+    currentSessionId,
+  } = useSpeedBoxStore((state) => ({
+    currentTicket: state.currentTicket,
+    currentProduct: state.currentProduct,
+    selectedProducts: state.selectedProducts,
+    remainingSeconds: state.remainingSeconds,
+    startSession: state.startSession,
+    handleAdd: state.handleAdd,
+    handleSkip: state.handleSkip,
+    tick: state.tick,
+    currentSessionId: state.currentSessionId,
   }));
 
   useEffect(() => {
+    if (currentSessionId) return;
     if (!currentTicket || currentTicket.id !== ticketId) {
       startSession(ticketId);
     }
-  }, [currentTicket, ticketId, startSession]);
+  }, [ticketId, currentTicket, startSession, currentSessionId]);
 
   useEffect(() => {
-    if (!isRunning) return;
+    if (!currentTicket || !currentProduct) return;
     const interval = setInterval(() => tick(), 1000);
     return () => clearInterval(interval);
-  }, [isRunning, tick]);
+  }, [currentTicket, currentProduct, tick]);
 
   useEffect(() => {
-    if (currentSession) {
-      router.push(`/summary/${currentSession.id}`);
+    if (currentSessionId && !currentProduct) {
+      router.push(`/summary/${currentSessionId}`);
     }
-  }, [currentSession, router]);
+  }, [currentSessionId, currentProduct, router]);
 
-  const totalValue = selectedProducts.reduce((sum, sp) => sum + sp.valueContribution, 0);
-  const valueEstimate = currentTicket && currentProduct
-    ? Math.min(currentProduct.originalPrice, currentTicket.price * 1.4)
-    : 0;
-  const remainingProducts = Math.max(productSequence.length - (currentProductIndex + 1), 0);
+  const totalValue = useMemo(
+    () => selectedProducts.reduce((sum, entry) => sum + entry.product.originalPrice, 0),
+    [selectedProducts],
+  );
 
   return (
-    <LayoutShell title="SpeedBox" subtitle="Aggiungi solo i prodotti migliori">
-      {currentTicket && (
-        <div className="flex justify-center mb-4">
-          <TimerCircle remainingSeconds={remainingSeconds} totalSeconds={currentTicket.totalSeconds} />
+    <div className="relative">
+      <LayoutShell
+        title={currentTicket ? currentTicket.label : "SpeedBox"}
+        subtitle="Swipe. Seleziona. Ama la tua box."
+        eyebrow="Discover"
+        className="pb-40"
+      >
+        <div className="relative">
+          <ProductCard
+            product={currentProduct}
+            ticket={currentTicket}
+            totalValue={totalValue}
+            selectedCount={selectedProducts.length}
+          />
+          <div className="absolute -right-6 top-1/2 hidden -translate-y-1/2 sm:block">
+            <FloatingActions onAdd={handleAdd} onSkip={handleSkip} disabled={!currentProduct} />
+          </div>
         </div>
-      )}
-
-      {currentProduct ? (
-        <ProductCard product={currentProduct} valueContributionEstimate={valueEstimate} totalBoxValue={totalValue} />
-      ) : (
-        <div className="bg-sbCard rounded-3xl shadow-[0_8px_18px_rgba(0,0,0,0.08)] p-6 text-center text-sm text-sbRichBlack/70">
-          Nessun prodotto disponibile
+        <div className="flex flex-col gap-4 rounded-3xl bg-white/70 p-4 text-sm text-sbTextDark shadow-[0_15px_30px_rgba(0,0,0,0.08)] sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-sbPinkDeep">Tempo rimasto</p>
+            <TimerPill remainingSeconds={remainingSeconds} totalSeconds={currentTicket?.totalSeconds ?? 0} />
+          </div>
+          <div className="text-right">
+            <p className="text-xs uppercase tracking-widest text-sbPinkDeep">Risparmio potenziale</p>
+            <p className="text-lg font-semibold text-sbRed">
+              +{Math.max(0, totalValue - (currentTicket?.ticketPrice ?? 0)).toFixed(2)}€
+            </p>
+          </div>
         </div>
-      )}
-
-      <div className="flex justify-center pt-4">
-        <FloatingActions onAdd={handleAdd} onSkip={handleSkip} />
-      </div>
-
-      <div className="text-center text-xs text-sbRichBlack/60">
-        Prodotti rimanenti: {remainingProducts}
-      </div>
-    </LayoutShell>
+        <div className="rounded-3xl bg-white/50 p-4 text-xs text-sbTextDark/70">
+          Ogni ADD consuma 30 secondi, ogni SKIP ne consuma 10. L'algoritmo SpeedBox filtra automaticamente i prodotti che
+          potrebbero far sforare il budget interno o l'hype medio, così ogni carta che vedi è sempre sicura da aggiungere.
+        </div>
+        <div className="sm:hidden">
+          <FloatingActions onAdd={handleAdd} onSkip={handleSkip} disabled={!currentProduct} />
+        </div>
+      </LayoutShell>
+      <BottomNav active="game" gameHref={`/game/${ticketId}`} />
+    </div>
   );
 }
