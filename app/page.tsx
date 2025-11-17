@@ -7,16 +7,16 @@ import { useState } from "react";
 
 const slides = [
   {
-    title: "Swipe & Add",
-    description: "Scorri i prodotti come in una dating app e riempi la tua box in pochi secondi.",
+    title: "Scegli un ticket",
+    description: "30, 50, 80 o 100€. Più alto il ticket, più tempo hai per comporre la box.",
   },
   {
-    title: "Tickets lampo",
-    description: "Scegli il ticket che preferisci e gioca contro il tempo per massimizzare il valore.",
+    title: "ADD vs SKIP",
+    description: "Ogni ADD consuma 30 secondi, ogni SKIP solo 10. Usa il tempo con strategia!",
   },
   {
-    title: "BeautyVes Edition",
-    description: "Se catturi almeno un prodotto BeautyVes sblocchi il valore minimo speciale.",
+    title: "Valore finale garantito",
+    description: "Alla fine ricevi una box con valore sempre superiore al ticket. BeautyVes la potenzia ancora di più.",
   },
 ];
 

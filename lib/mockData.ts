@@ -1,4 +1,4 @@
-import { Product, Ticket } from "./types";
+import { Product, QuizQuestion, Ticket } from "./types";
 
 export const tickets: Ticket[] = [
   {
@@ -32,6 +32,33 @@ export const tickets: Ticket[] = [
     totalSeconds: 330,
     valueMinBase: 220,
     valueMinBeautyVesEdition: 320,
+  },
+];
+
+export const quizQuestions: QuizQuestion[] = [
+  {
+    id: "quiz-1",
+    question: "BeautyVes è famosa per quali prodotti signature?",
+    options: ["Mascara iper volumizzanti", "Palette di ombretti neutri", "Pennelli da skincare"],
+    correctIndex: 0,
+  },
+  {
+    id: "quiz-2",
+    question: "Cosa succede quando fai ADD su un prodotto durante il gioco?",
+    options: ["Guadagni 60 secondi", "Perdi 30 secondi", "Non succede nulla al timer"],
+    correctIndex: 1,
+  },
+  {
+    id: "quiz-3",
+    question: "Qual è il vantaggio della BeautyVes Edition?",
+    options: ["Spedizione gratuita", "Valore minimo della box aumentato", "Raddoppio dei biglietti"],
+    correctIndex: 1,
+  },
+  {
+    id: "quiz-4",
+    question: "Qual è la mossa più rapida per scartare un prodotto?",
+    options: ["Swipe a destra", "Premere SKIP", "Premere ADD"],
+    correctIndex: 1,
   },
 ];
 
