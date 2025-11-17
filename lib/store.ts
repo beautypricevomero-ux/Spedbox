@@ -1,395 +1,479 @@
 "use client";
 
 import { create } from "zustand";
-import { Product, SelectedProduct, SpeedSession, TicketOption } from "@/lib/types";
 
-const MAX_LUXURY_TOTAL = 3;
-const MAX_LUXURY_PERFUME = 1;
-const MAX_LUXURY_SKINCARE = 1;
+import { ANIM } from "./animationConfig";
+import { products as mockProducts, quizQuestions, tickets as ticketOptions } from "./mockData";
+import { Product, QuizQuestion, SelectedProduct, Session, Ticket } from "./types";
 
-const TICKETS: TicketOption[] = [
-  { id: "30", price: 30, totalSeconds: 90, minValue: 60 },
-  { id: "50", price: 50, totalSeconds: 180, minValue: 100, label: "Consigliato" },
-  { id: "80", price: 80, totalSeconds: 240, minValue: 160 },
-  { id: "100", price: 100, totalSeconds: 300, minValue: 220, label: "Limited" }
-];
+const H_MIN = 40;
+const H_MAX = 80;
 
-const PRODUCTS: Product[] = [
-  {
-    id: "p1",
-    name: "Rossetto Velvet Bloom",
-    category: "makeup",
-    originalPrice: 29.9,
-    costForStore: 7.5,
-    image: "https://images.unsplash.com/photo-1526045478516-99145907023c?auto=format&fit=crop&w=400&q=80",
-    isLuxury: false,
-    hypeScore: 55
-  },
-  {
-    id: "p2",
-    name: "Palette Ombre Rose",
-    category: "makeup",
-    originalPrice: 44.9,
-    costForStore: 10.2,
-    image: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=400&q=80",
-    isLuxury: false,
-    hypeScore: 62
-  },
-  {
-    id: "p3",
-    name: "Siero Vitamina C",
-    category: "skincare",
-    originalPrice: 59.9,
-    costForStore: 14.5,
-    image: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=400&q=80",
-    isLuxury: false,
-    hypeScore: 48
-  },
-  {
-    id: "p4",
-    name: "Crema Idratante Giorno",
-    category: "skincare",
-    originalPrice: 34.9,
-    costForStore: 8.4,
-    image: "https://images.unsplash.com/photo-1582719478125-1cf5c99b2f86?auto=format&fit=crop&w=400&q=80",
-    isLuxury: false,
-    hypeScore: 52
-  },
-  {
-    id: "p5",
-    name: "Profumo Couture Rouge",
-    category: "perfume",
-    originalPrice: 89.9,
-    costForStore: 18.5,
-    image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=400&q=80",
-    isLuxury: true,
-    hypeScore: 68
-  },
-  {
-    id: "p6",
-    name: "Fondotinta Satin Skin",
-    category: "makeup",
-    originalPrice: 39.9,
-    costForStore: 9.7,
-    image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=400&q=80",
-    isLuxury: false,
-    hypeScore: 50
-  },
-  {
-    id: "p7",
-    name: "Luxury Lip Velvet",
-    category: "makeup",
-    originalPrice: 55.0,
-    costForStore: 13.5,
-    image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=400&q=80",
-    isLuxury: true,
-    hypeScore: 66
-  },
-  {
-    id: "p8",
-    name: "Mist Idratante Rosa",
-    category: "skincare",
-    originalPrice: 28.0,
-    costForStore: 6.4,
-    image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=400&q=80",
-    isLuxury: false,
-    hypeScore: 42
-  },
-  {
-    id: "p9",
-    name: "Olio Nutriente Lumière",
-    category: "skincare",
-    originalPrice: 64.0,
-    costForStore: 15.0,
-    image: "https://images.unsplash.com/photo-1529676468690-a442a6c78fcd?auto=format&fit=crop&w=400&q=80",
-    isLuxury: true,
-    hypeScore: 58
-  },
-  {
-    id: "p10",
-    name: "Mascara Volume Bloom",
-    category: "makeup",
-    originalPrice: 24.9,
-    costForStore: 6.0,
-    image: "https://images.unsplash.com/photo-1526045478516-99145907023c?auto=format&fit=crop&w=400&q=80",
-    isLuxury: false,
-    hypeScore: 47
-  },
-  {
-    id: "p11",
-    name: "Roller Ghiaccio Glow",
-    category: "accessory",
-    originalPrice: 32.0,
-    costForStore: 7.8,
-    image: "https://images.unsplash.com/photo-1612810433267-1b59c8589b66?auto=format&fit=crop&w=400&q=80",
-    isLuxury: false,
-    hypeScore: 44
-  },
-  {
-    id: "p12",
-    name: "Detergente Mousse Delicata",
-    category: "skincare",
-    originalPrice: 22.0,
-    costForStore: 5.5,
-    image: "https://images.unsplash.com/photo-1582719478248-54e9f2af69d9?auto=format&fit=crop&w=400&q=80",
-    isLuxury: false,
-    hypeScore: 41
-  },
-  {
-    id: "p13",
-    name: "Profumo Gardenia Chic",
-    category: "perfume",
-    originalPrice: 72.0,
-    costForStore: 16.0,
-    image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=400&q=80",
-    isLuxury: false,
-    hypeScore: 63
-  },
-  {
-    id: "p14",
-    name: "Crema Notte Luxury Peonia",
-    category: "skincare",
-    originalPrice: 78.0,
-    costForStore: 17.5,
-    image: "https://images.unsplash.com/photo-1506617420156-8e4536971650?auto=format&fit=crop&w=400&q=80",
-    isLuxury: true,
-    hypeScore: 60
-  },
-  {
-    id: "p15",
-    name: "Gloss Crystal Shine",
-    category: "makeup",
-    originalPrice: 19.0,
-    costForStore: 4.5,
-    image: "https://images.unsplash.com/photo-1526045478516-99145907023c?auto=format&fit=crop&w=400&q=80",
-    isLuxury: false,
-    hypeScore: 45
+const getCostTargets = (ticket: Ticket) => {
+  const targetCost = ticket.ticketPrice * 0.5;
+  return {
+    targetCost,
+    minCost: targetCost * 0.9,
+    maxCost: targetCost * 1.1,
+  };
+};
+
+const shuffle = <T,>(list: T[]): T[] => {
+  const array = [...list];
+  for (let i = array.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
   }
-];
+  return array;
+};
 
-interface SpeedBoxState {
-  tickets: TicketOption[];
+const buildProductPool = (allProducts: Product[]) => {
+  const heroes = shuffle(allProducts.filter((p) => p.tier === "hero"));
+  const premium = shuffle(allProducts.filter((p) => p.tier === "premium"));
+  const fillers = shuffle(allProducts.filter((p) => p.tier === "filler"));
+  return [...heroes, ...premium, ...fillers];
+};
+
+interface NextProductPayload {
+  currentTicket: Ticket;
+  notYetShownProducts: Product[];
+  currentCost: number;
+  currentHypeSum: number;
+  selectedCount: number;
+  remainingSeconds: number;
+}
+
+interface NextProductResult {
+  product: Product | null;
+  remainingPool: Product[];
+  costSafeCount: number;
+}
+
+const chooseNextProduct = (payload: NextProductPayload): NextProductResult => {
+  const { currentTicket, notYetShownProducts, currentCost, currentHypeSum, selectedCount, remainingSeconds } = payload;
+  if (!currentTicket || notYetShownProducts.length === 0) {
+    return { product: null, remainingPool: [], costSafeCount: 0 };
+  }
+
+  const { maxCost } = getCostTargets(currentTicket);
+  const remainingBudget = maxCost - currentCost;
+  const costSafeProducts = notYetShownProducts.filter((p) => p.purchaseCost <= remainingBudget);
+  const costSafeCount = costSafeProducts.length;
+
+  if (costSafeCount === 0) {
+    return { product: null, remainingPool: [], costSafeCount: 0 };
+  }
+
+  const currentAvgHype = selectedCount === 0 ? null : currentHypeSum / selectedCount;
+
+  const hypeSafeProducts = costSafeProducts.filter((p) => {
+    const hypoAvg = selectedCount === 0 ? p.hypeScore : (currentHypeSum + p.hypeScore) / (selectedCount + 1);
+    return hypoAvg >= H_MIN && hypoAvg <= H_MAX;
+  });
+
+  const candidates = hypeSafeProducts.length > 0 ? hypeSafeProducts : costSafeProducts;
+
+  const getTierWeight = (product: Product) => {
+    if (product.tier === "hero") return 0;
+    if (product.tier === "premium") return 1;
+    return 2;
+  };
+
+  const secondsRatio = currentTicket.totalSeconds === 0 ? 0 : remainingSeconds / currentTicket.totalSeconds;
+
+  const sorted = [...candidates].sort((a, b) => {
+    const tierDiff = getTierWeight(a) - getTierWeight(b);
+    if (tierDiff !== 0) return tierDiff;
+
+    if (secondsRatio > 0.6) {
+      const hypeDiff = b.hypeScore - a.hypeScore;
+      if (hypeDiff !== 0) return hypeDiff;
+    }
+
+    if (secondsRatio < 0.3) {
+      const costDiff = a.purchaseCost - b.purchaseCost;
+      if (costDiff !== 0) return costDiff;
+    }
+
+    if (currentAvgHype && currentAvgHype > 70) {
+      const balanceDiff = a.hypeScore - b.hypeScore;
+      if (balanceDiff !== 0) return balanceDiff;
+    }
+
+    if (currentAvgHype && currentAvgHype < 50) {
+      const liftDiff = b.hypeScore - a.hypeScore;
+      if (liftDiff !== 0) return liftDiff;
+    }
+
+    const purchaseDiff = a.purchaseCost - b.purchaseCost;
+    if (purchaseDiff !== 0) return purchaseDiff;
+
+    return a.id.localeCompare(b.id);
+  });
+
+  const nextProduct = sorted[0] ?? null;
+  const remainingPool = nextProduct
+    ? notYetShownProducts.filter((p) => p.id !== nextProduct.id)
+    : notYetShownProducts;
+
+  return { product: nextProduct, remainingPool, costSafeCount };
+};
+
+interface BannerMessage {
+  id: string;
+  message: string;
+}
+
+interface GameState {
+  tickets: Ticket[];
   products: Product[];
-  productSequence: Product[];
-  currentSession: SpeedSession | null;
-  currentTicket: TicketOption | null;
-  currentProductIndex: number;
+  currentTicket: Ticket | null;
+  currentSessionId: string | null;
   currentProduct: Product | null;
+  notYetShownProducts: Product[];
   selectedProducts: SelectedProduct[];
   remainingSeconds: number;
-  isRunning: boolean;
-  feedbackMessage: string | null;
-  sessionsHistory: SpeedSession[];
+  currentCost: number;
+  currentHypeSum: number;
+  selectedCount: number;
+  sessionsHistory: Session[];
+  hasBeautyVesEdition: boolean;
+  totalValue: number;
+  gameOver: boolean;
+  lastAction: "add" | "skip" | null;
+  banner: BannerMessage | null;
+  quizShown: boolean;
+  quizActive: boolean;
+  quizQuestion: QuizQuestion | null;
+  hasShownTripleValueBanner: boolean;
+  hasShownCostSafeWarning: boolean;
+  hasShownUltraHypeBanner: boolean;
+  hasShownBeautyVesBanner: boolean;
 
   startSession: (ticketId: string) => void;
   handleAdd: () => void;
   handleSkip: () => void;
   tick: () => void;
   endSession: () => void;
-  getSessionById: (id: string) => SpeedSession | undefined;
+  getSessionById: (id: string) => Session | undefined;
+  showBanner: (message: string) => void;
+  clearBanner: () => void;
+  answerQuiz: (optionIndex: number) => void;
+  skipQuiz: () => void;
+  markSessionComplete: () => void;
 }
 
-function prepareProductSequence(products: Product[]): Product[] {
-  const normal = products.filter((p) => !p.isLuxury).sort((a, b) => a.originalPrice - b.originalPrice);
-  const luxuryRaw = products.filter((p) => p.isLuxury).sort((a, b) => a.originalPrice - b.originalPrice);
+const pickQuizQuestion = (): QuizQuestion | null => {
+  if (quizQuestions.length === 0) return null;
+  const index = Math.floor(Math.random() * quizQuestions.length);
+  return quizQuestions[index] ?? null;
+};
 
-  const luxuryLimited: Product[] = [];
-  let totalLuxury = 0;
-  let luxuryPerfume = 0;
-  let luxurySkincare = 0;
+let bannerTimeout: NodeJS.Timeout | null = null;
 
-  for (const product of luxuryRaw) {
-    const wouldExceedTotal = totalLuxury + 1 > MAX_LUXURY_TOTAL;
-    const wouldExceedPerfume = product.category === "perfume" && luxuryPerfume + 1 > MAX_LUXURY_PERFUME;
-    const wouldExceedSkincare = product.category === "skincare" && luxurySkincare + 1 > MAX_LUXURY_SKINCARE;
-    if (wouldExceedTotal || wouldExceedPerfume || wouldExceedSkincare) continue;
-    luxuryLimited.push(product);
-    totalLuxury += 1;
-    if (product.category === "perfume") luxuryPerfume += 1;
-    if (product.category === "skincare") luxurySkincare += 1;
-  }
-
-  const sequence: Product[] = [];
-  let normalIndex = 0;
-  let luxuryIndex = 0;
-  let stepsUntilLuxury = 3;
-
-  while (normalIndex < normal.length) {
-    sequence.push(normal[normalIndex]);
-    normalIndex += 1;
-    stepsUntilLuxury -= 1;
-
-    if (stepsUntilLuxury <= 0 && luxuryIndex < luxuryLimited.length) {
-      sequence.push(luxuryLimited[luxuryIndex]);
-      luxuryIndex += 1;
-      stepsUntilLuxury = 3 + (luxuryIndex % 2); // alternate between 3 and 4
+export const useSpeedBoxStore = create<GameState>((set, get) => {
+  const triggerArrivalEffects = (product: Product | null, costSafeCount: number) => {
+    if (!product) return;
+    const state = get();
+    if (product.hypeScore >= 95 && !state.hasShownUltraHypeBanner) {
+      set({ hasShownUltraHypeBanner: true });
+      get().showBanner("Prodotto super richiesto! Lo lasci andare? 🔥");
     }
-  }
-
-  while (luxuryIndex < luxuryLimited.length) {
-    sequence.push(luxuryLimited[luxuryIndex]);
-    luxuryIndex += 1;
-  }
-
-  return sequence;
-}
-
-function calculateCurrentStoreCost(selectedProducts: SelectedProduct[]) {
-  return selectedProducts.reduce((sum, sp) => sum + sp.product.costForStore, 0);
-}
-
-function calculateAvgHype(selectedProducts: SelectedProduct[]) {
-  if (selectedProducts.length === 0) return 0;
-  const sum = selectedProducts.reduce((acc, sp) => acc + sp.product.hypeScore, 0);
-  return sum / selectedProducts.length;
-}
-
-function canAddProduct(product: Product, state: SpeedBoxState): boolean {
-  if (!state.currentTicket) return false;
-  const currentStoreCost = calculateCurrentStoreCost(state.selectedProducts);
-  const proposedCost = currentStoreCost + product.costForStore;
-  const maxStoreCost = state.currentTicket.price * 0.5;
-  if (proposedCost > maxStoreCost) return false;
-
-  const luxuryTotal = state.selectedProducts.filter((p) => p.product.isLuxury).length;
-  const luxuryPerfume = state.selectedProducts.filter((p) => p.product.isLuxury && p.product.category === "perfume").length;
-  const luxurySkincare = state.selectedProducts.filter((p) => p.product.isLuxury && p.product.category === "skincare").length;
-
-  if (product.isLuxury) {
-    if (luxuryTotal + 1 > MAX_LUXURY_TOTAL) return false;
-    if (product.category === "perfume" && luxuryPerfume + 1 > MAX_LUXURY_PERFUME) return false;
-    if (product.category === "skincare" && luxurySkincare + 1 > MAX_LUXURY_SKINCARE) return false;
-  }
-
-  const count = state.selectedProducts.length;
-  const currentAvg = calculateAvgHype(state.selectedProducts);
-  const proposedAvg = (currentAvg * count + product.hypeScore) / (count + 1);
-
-  if (proposedAvg < 40 || proposedAvg > 70) return false;
-
-  return true;
-}
-
-export const useSpeedBoxStore = create<SpeedBoxState>((set, get) => ({
-  tickets: TICKETS,
-  products: PRODUCTS,
-  productSequence: [],
-  currentSession: null,
-  currentTicket: null,
-  currentProductIndex: 0,
-  currentProduct: null,
-  selectedProducts: [],
-  remainingSeconds: 0,
-  isRunning: false,
-  feedbackMessage: null,
-  sessionsHistory: [],
-
-  startSession: (ticketId: string) => {
-    const ticket = get().tickets.find((t) => t.id === ticketId);
-    if (!ticket) return;
-    const sequence = prepareProductSequence(get().products);
-    set({
-      currentTicket: ticket,
-      currentSession: null,
-      productSequence: sequence,
-      currentProductIndex: 0,
-      currentProduct: sequence[0] ?? null,
-      selectedProducts: [],
-      remainingSeconds: ticket.totalSeconds,
-      isRunning: true,
-      feedbackMessage: null,
-    });
-  },
-
-  handleAdd: () => {
-    const state = get();
-    const product = state.currentProduct;
-    if (!product || !state.isRunning || !state.currentTicket) return;
-
-    const allowed = canAddProduct(product, state);
-    const timePenalty = allowed ? 30 : 10;
-    const updatedSelected: SelectedProduct[] = allowed
-      ? [...state.selectedProducts, {
-        id: product.id,
-        product,
-        valueContribution: Math.min(product.originalPrice, state.currentTicket.price * 1.4)
-      }]
-      : state.selectedProducts;
-
-    const newRemaining = Math.max(state.remainingSeconds - timePenalty, 0);
-    const nextIndex = state.currentProductIndex + 1;
-    const nextProduct = state.productSequence[nextIndex] ?? null;
-
-    set({
-      selectedProducts: updatedSelected,
-      remainingSeconds: newRemaining,
-      currentProductIndex: nextIndex,
-      currentProduct: nextProduct,
-      feedbackMessage: allowed ? null : "Bilanciamento interno: salto automatico",
-    });
-
-    if (newRemaining <= 0 || !nextProduct) {
-      get().endSession();
+    if (costSafeCount === 1 && !state.hasShownCostSafeWarning) {
+      set({ hasShownCostSafeWarning: true });
+      get().showBanner("Attenzione: ultimi prodotti disponibili per questa box 👀");
     }
-  },
+  };
 
-  handleSkip: () => {
+  const maybeTriggerQuiz = (seconds: number) => {
     const state = get();
-    if (!state.isRunning) return;
-    const newRemaining = Math.max(state.remainingSeconds - 10, 0);
-    const nextIndex = state.currentProductIndex + 1;
-    const nextProduct = state.productSequence[nextIndex] ?? null;
-
-    set({
-      remainingSeconds: newRemaining,
-      currentProductIndex: nextIndex,
-      currentProduct: nextProduct,
-      feedbackMessage: null,
-    });
-
-    if (newRemaining <= 0 || !nextProduct) {
-      get().endSession();
+    if (!state.currentTicket || state.quizShown || state.quizActive || state.gameOver) return;
+    if (seconds <= 0) return;
+    if (seconds <= state.currentTicket.totalSeconds / 2) {
+      const question = pickQuizQuestion();
+      if (!question) return;
+      set({ quizShown: true, quizActive: true, quizQuestion: question });
     }
-  },
+  };
 
-  tick: () => {
-    const state = get();
-    if (!state.isRunning) return;
-    const updated = Math.max(state.remainingSeconds - 1, 0);
-    set({ remainingSeconds: updated });
-    if (updated <= 0) {
-      get().endSession();
-    }
-  },
+  return {
+    tickets: ticketOptions,
+    products: mockProducts,
+    currentTicket: null,
+    currentSessionId: null,
+    currentProduct: null,
+    notYetShownProducts: [],
+    selectedProducts: [],
+    remainingSeconds: 0,
+    currentCost: 0,
+    currentHypeSum: 0,
+    selectedCount: 0,
+    sessionsHistory: [],
+    hasBeautyVesEdition: false,
+    totalValue: 0,
+    gameOver: false,
+    lastAction: null,
+    banner: null,
+    quizShown: false,
+    quizActive: false,
+    quizQuestion: null,
+    hasShownTripleValueBanner: false,
+    hasShownCostSafeWarning: false,
+    hasShownUltraHypeBanner: false,
+    hasShownBeautyVesBanner: false,
 
-  endSession: () => {
-    const state = get();
-    if (!state.currentTicket) return;
-    if (!state.isRunning && !state.currentSession) return;
-    const totalValue = state.selectedProducts.reduce((sum, sp) => sum + sp.valueContribution, 0);
-    const totalSaved = Math.max(totalValue - state.currentTicket.price, 0);
-    const session: SpeedSession = {
-      id: crypto.randomUUID(),
-      ticket: state.currentTicket,
-      selectedProducts: state.selectedProducts,
-      totalValue,
-      totalSaved,
-      remainingSeconds: state.remainingSeconds,
-      createdAt: new Date().toISOString(),
-    };
+    startSession: (ticketId) => {
+      const ticket = get().tickets.find((t) => t.id === ticketId);
+      if (!ticket) return;
 
-    set({
-      currentSession: session,
-      sessionsHistory: [...state.sessionsHistory, session],
-      isRunning: false,
-      currentProduct: null,
-      feedbackMessage: null,
-    });
-  },
+      const productPool = buildProductPool(get().products);
+      const selection = chooseNextProduct({
+        currentTicket: ticket,
+        notYetShownProducts: productPool,
+        currentCost: 0,
+        currentHypeSum: 0,
+        selectedCount: 0,
+        remainingSeconds: ticket.totalSeconds,
+      });
 
-  getSessionById: (id: string) => {
-    const state = get();
-    if (state.currentSession?.id === id) return state.currentSession;
-    return state.sessionsHistory.find((s) => s.id === id);
-  }
-}));
+      set({
+        currentTicket: ticket,
+        currentSessionId: null,
+        currentProduct: selection.product,
+        notYetShownProducts: selection.remainingPool,
+        selectedProducts: [],
+        remainingSeconds: ticket.totalSeconds,
+        currentCost: 0,
+        currentHypeSum: 0,
+        selectedCount: 0,
+        hasBeautyVesEdition: false,
+        totalValue: 0,
+        gameOver: false,
+        lastAction: null,
+        banner: null,
+        quizShown: false,
+        quizActive: false,
+        quizQuestion: null,
+        hasShownTripleValueBanner: false,
+        hasShownCostSafeWarning: false,
+        hasShownUltraHypeBanner: false,
+        hasShownBeautyVesBanner: false,
+      });
+
+      triggerArrivalEffects(selection.product, selection.costSafeCount);
+
+      if (!selection.product) {
+        get().markSessionComplete();
+      }
+    },
+
+    handleAdd: () => {
+      const state = get();
+      if (!state.currentProduct || !state.currentTicket) return;
+      if (state.quizActive || state.gameOver) return;
+
+      const addedProduct = state.currentProduct;
+      const newSelectedProducts: SelectedProduct[] = [...state.selectedProducts, { product: addedProduct }];
+      const updatedCost = state.currentCost + addedProduct.purchaseCost;
+      const updatedHype = state.currentHypeSum + addedProduct.hypeScore;
+      const updatedCount = state.selectedCount + 1;
+      const updatedSeconds = Math.max(0, state.remainingSeconds - 30);
+      const newTotalValue = state.totalValue + addedProduct.originalPrice;
+      const unlockedBeauty = addedProduct.isBeautyVes && !state.hasBeautyVesEdition;
+      const shouldShowBeautyBanner = unlockedBeauty && !state.hasShownBeautyVesBanner;
+      const shouldShowTripleValueBanner =
+        !state.hasShownTripleValueBanner && newTotalValue >= state.currentTicket.ticketPrice * 3;
+
+      const selection = chooseNextProduct({
+        currentTicket: state.currentTicket,
+        notYetShownProducts: state.notYetShownProducts,
+        currentCost: updatedCost,
+        currentHypeSum: updatedHype,
+        selectedCount: updatedCount,
+        remainingSeconds: updatedSeconds,
+      });
+
+      set({
+        selectedProducts: newSelectedProducts,
+        currentCost: updatedCost,
+        currentHypeSum: updatedHype,
+        selectedCount: updatedCount,
+        remainingSeconds: updatedSeconds,
+        currentProduct: selection.product,
+        notYetShownProducts: selection.remainingPool,
+        totalValue: newTotalValue,
+        hasBeautyVesEdition: state.hasBeautyVesEdition || addedProduct.isBeautyVes,
+        lastAction: "add",
+      });
+
+      if (shouldShowBeautyBanner) {
+        set({ hasShownBeautyVesBanner: true });
+        get().showBanner("Hai sbloccato la BeautyVes Edition: valore minimo potenziato 🎁");
+      }
+
+      if (shouldShowTripleValueBanner) {
+        set({ hasShownTripleValueBanner: true });
+        get().showBanner("La tua SpeedBox vale già oltre 3× il ticket 🤯");
+      }
+
+      triggerArrivalEffects(selection.product, selection.costSafeCount);
+      maybeTriggerQuiz(updatedSeconds);
+
+      if (!selection.product || updatedSeconds <= 0) {
+        if (updatedSeconds <= 0) {
+          set({ remainingSeconds: 0 });
+        }
+        get().markSessionComplete();
+      }
+    },
+
+    handleSkip: () => {
+      const state = get();
+      if (!state.currentTicket || !state.currentProduct) return;
+      if (state.quizActive || state.gameOver) return;
+
+      const updatedSeconds = Math.max(0, state.remainingSeconds - 10);
+
+      const selection = chooseNextProduct({
+        currentTicket: state.currentTicket,
+        notYetShownProducts: state.notYetShownProducts,
+        currentCost: state.currentCost,
+        currentHypeSum: state.currentHypeSum,
+        selectedCount: state.selectedCount,
+        remainingSeconds: updatedSeconds,
+      });
+
+      set({
+        remainingSeconds: updatedSeconds,
+        currentProduct: selection.product,
+        notYetShownProducts: selection.remainingPool,
+        lastAction: "skip",
+      });
+
+      triggerArrivalEffects(selection.product, selection.costSafeCount);
+      maybeTriggerQuiz(updatedSeconds);
+
+      if (!selection.product || updatedSeconds <= 0) {
+        if (updatedSeconds <= 0) {
+          set({ remainingSeconds: 0 });
+        }
+        get().markSessionComplete();
+      }
+    },
+
+    tick: () => {
+      const state = get();
+      if (!state.currentTicket || !state.currentProduct) return;
+      if (state.quizActive || state.gameOver) return;
+
+      if (state.remainingSeconds <= 1) {
+        set({ remainingSeconds: 0 });
+        get().markSessionComplete();
+        return;
+      }
+
+      const updatedSeconds = state.remainingSeconds - 1;
+      set({ remainingSeconds: updatedSeconds });
+      maybeTriggerQuiz(updatedSeconds);
+    },
+
+    markSessionComplete: () => {
+      const state = get();
+      if (state.gameOver) return;
+      set({ gameOver: true });
+      setTimeout(() => {
+        get().endSession();
+      }, ANIM.GAME_OVER_DELAY * 1000);
+    },
+
+    endSession: () => {
+      const state = get();
+      if (!state.currentTicket) return;
+
+      const sessionId = crypto.randomUUID();
+      const snapshot: SelectedProduct[] = state.selectedProducts.map((item) => ({
+        product: item.product,
+      }));
+
+      const totalValue = snapshot.reduce((sum, entry) => sum + entry.product.originalPrice, 0);
+      const totalPurchaseCost = state.currentCost;
+      const avgHype = state.selectedCount === 0 ? null : state.currentHypeSum / state.selectedCount;
+      const hasBeautyVesEdition = snapshot.some((entry) => entry.product.isBeautyVes);
+
+      const session: Session = {
+        id: sessionId,
+        ticket: state.currentTicket,
+        selectedProducts: snapshot,
+        totalValue,
+        totalPurchaseCost,
+        avgHype,
+        createdAt: new Date().toISOString(),
+        hasBeautyVesEdition,
+      };
+
+      set((prev) => ({
+        ...prev,
+        sessionsHistory: [...prev.sessionsHistory, session],
+        currentSessionId: sessionId,
+        currentTicket: null,
+        currentProduct: null,
+        notYetShownProducts: [],
+        selectedProducts: [],
+        remainingSeconds: 0,
+        currentCost: 0,
+        currentHypeSum: 0,
+        selectedCount: 0,
+        totalValue: 0,
+        quizActive: false,
+        quizQuestion: null,
+        quizShown: false,
+      }));
+    },
+
+    answerQuiz: (optionIndex) => {
+      const state = get();
+      if (!state.quizActive || !state.quizQuestion) return;
+      const isCorrect = optionIndex === state.quizQuestion.correctIndex;
+      const updatedSeconds = isCorrect ? state.remainingSeconds + 30 : state.remainingSeconds;
+
+      set({
+        quizActive: false,
+        quizQuestion: null,
+        remainingSeconds: updatedSeconds,
+      });
+
+      if (isCorrect) {
+        get().showBanner("Risposta corretta! +30 secondi ⏱");
+      } else {
+        get().showBanner("Risposta sbagliata! Nessun bonus 😅");
+      }
+    },
+
+    skipQuiz: () => {
+      const state = get();
+      if (!state.quizActive) return;
+      set({ quizActive: false, quizQuestion: null });
+    },
+
+    showBanner: (message) => {
+      if (bannerTimeout) {
+        clearTimeout(bannerTimeout);
+      }
+      const payload: BannerMessage = { id: crypto.randomUUID(), message };
+      set({ banner: payload });
+      bannerTimeout = setTimeout(() => {
+        set({ banner: null });
+      }, ANIM.BANNER_DURATION * 1000);
+    },
+
+    clearBanner: () => {
+      if (bannerTimeout) {
+        clearTimeout(bannerTimeout);
+        bannerTimeout = null;
+      }
+      set({ banner: null });
+    },
+
+    getSessionById: (id) => get().sessionsHistory.find((session) => session.id === id),
+  };
+});

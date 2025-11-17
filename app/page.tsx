@@ -1,71 +1,76 @@
 "use client";
 
 import { LayoutShell } from "@/components/LayoutShell";
-import { PrimaryButton } from "@/components/PrimaryButton";
-import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
 const slides = [
   {
-    title: "Benvenuta in SpeedBox",
-    subtitle: "La box che scegli tu… in pochi secondi."
+    title: "Scegli un ticket",
+    description: "30, 50, 80 o 100€. Più alto il ticket, più tempo hai per comporre la box.",
   },
   {
-    title: "Come funziona",
-    subtitle: "Paga un ticket, tempo limitato, un prodotto alla volta. Aggiungi o salta."
+    title: "ADD vs SKIP",
+    description: "Ogni ADD consuma 30 secondi, ogni SKIP solo 10. Usa il tempo con strategia!",
   },
   {
-    title: "Valore garantito",
-    subtitle: "Ricevi sempre più di quanto paghi.",
-    cta: true
-  }
+    title: "Valore finale garantito",
+    description: "Alla fine ricevi una box con valore sempre superiore al ticket. BeautyVes la potenzia ancora di più.",
+  },
 ];
 
-export default function OnboardingPage() {
-  const router = useRouter();
-  const [step, setStep] = useState(0);
+export default function LandingPage() {
+  const [index, setIndex] = useState(0);
+  const slide = slides[index];
+
+  const handleNext = () => {
+    setIndex((prev) => (prev + 1) % slides.length);
+  };
 
   return (
-    <LayoutShell>
-      <div className="flex flex-col items-center justify-between min-h-[75vh] space-y-10">
-        <div className="h-64 w-full flex items-center justify-center">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={step}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="text-center space-y-3"
-            >
-              <h1 className="text-2xl sm:text-3xl font-bold text-sbRichBlack">{slides[step].title}</h1>
-              <p className="text-sm sm:text-base text-sbRichBlack/80">{slides[step].subtitle}</p>
-            </motion.div>
-          </AnimatePresence>
+    <LayoutShell title="SpeedBox" subtitle="Un gioco d'acquisto in stile Tinder" eyebrow="Benvenuta">
+      <div className="relative rounded-[2.5rem] bg-white/70 p-6 shadow-[0_30px_60px_rgba(255,75,110,0.2)] backdrop-blur">
+        <div className="absolute -top-8 right-6 h-16 w-16 rounded-full bg-sbPinkDeep/30 blur-3xl" />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={slide.title}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
+            transition={{ duration: 0.4 }}
+            className="relative"
+          >
+            <p className="text-sm uppercase tracking-[0.4em] text-sbPinkDeep">{slide.title}</p>
+            <p className="mt-4 text-lg text-sbTextDark/80">{slide.description}</p>
+          </motion.div>
+        </AnimatePresence>
+        <div className="mt-8 flex items-center justify-between">
+          <div className="flex gap-2">
+            {slides.map((_, idx) => (
+              <span
+                key={idx}
+                className={`h-2.5 w-2.5 rounded-full ${idx === index ? "bg-sbRed" : "bg-sbPink"}`}
+              />
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={handleNext}
+            className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-sbPinkDeep shadow"
+          >
+            Avanti
+          </button>
         </div>
-
-        <div className="flex items-center space-x-2">
-          {slides.map((_, idx) => (
-            <div
-              key={idx}
-              className={`h-2 w-2 rounded-full ${idx === step ? "bg-sbPrimaryRed" : "bg-sbRoseQuartz"}`}
-            />
-          ))}
-        </div>
-
-        <div className="w-full space-y-3">
-          {step < slides.length - 1 ? (
-            <PrimaryButton label="Avanti" onClick={() => setStep((prev) => Math.min(prev + 1, slides.length - 1))} />
-          ) : (
-            <PrimaryButton label="Inizia" onClick={() => router.push("/home")}
-            />
-          )}
-          {step > 0 && (
-            <button className="w-full text-sm text-sbRichBlack/70" onClick={() => setStep((prev) => Math.max(prev - 1, 0))}>
-              Torna indietro
-            </button>
-          )}
-        </div>
+      </div>
+      <div className="space-y-3">
+        <Link
+          href="/home"
+          className="block rounded-full bg-sbRed py-4 text-center text-lg font-semibold text-white shadow-[0_20px_40px_rgba(255,75,110,0.35)]"
+        >
+          Scegli il tuo ticket
+        </Link>
+        <p className="text-center text-xs text-sbTextDark/60">Demo experience · Nessun pagamento reale</p>
       </div>
     </LayoutShell>
   );

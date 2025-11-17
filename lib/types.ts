@@ -1,36 +1,48 @@
+export type ProductTier = "hero" | "premium" | "filler";
+
 export type ProductCategory = "makeup" | "skincare" | "perfume" | "accessory";
 
 export interface Product {
   id: string;
   name: string;
+  brand: string;
   category: ProductCategory;
   originalPrice: number;
-  costForStore: number;
-  image: string;
-  isLuxury: boolean;
+  purchaseCost: number;
   hypeScore: number;
+  isBeautyVes: boolean;
+  isLuxury: boolean;
+  tier: ProductTier;
+  imageUrl: string;
 }
 
-export interface TicketOption {
+export interface Ticket {
   id: string;
-  price: number;
+  label: string;
+  ticketPrice: number;
   totalSeconds: number;
-  minValue: number;
-  label?: string;
+  valueMinBase: number;
+  valueMinBeautyVesEdition: number;
 }
 
 export interface SelectedProduct {
-  id: string;
   product: Product;
-  valueContribution: number;
 }
 
-export interface SpeedSession {
+export interface Session {
   id: string;
-  ticket: TicketOption;
+  ticket: Ticket;
   selectedProducts: SelectedProduct[];
   totalValue: number;
-  totalSaved: number;
-  remainingSeconds: number;
+  totalPurchaseCost: number;
+  avgHype: number | null;
   createdAt: string;
+  hasBeautyVesEdition: boolean;
+}
+
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
 }
