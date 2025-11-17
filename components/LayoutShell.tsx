@@ -1,40 +1,32 @@
-"use client";
-
+import clsx from "clsx";
 import { ReactNode } from "react";
-import { motion } from "framer-motion";
 
 interface LayoutShellProps {
-  children: ReactNode;
   title?: string;
   subtitle?: string;
+  eyebrow?: string;
+  children: ReactNode;
+  className?: string;
+  actions?: ReactNode;
 }
 
-export function LayoutShell({ children, title, subtitle }: LayoutShellProps) {
+export function LayoutShell({
+  title,
+  subtitle,
+  eyebrow = "Discover",
+  children,
+  className,
+  actions,
+}: LayoutShellProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sbBackground to-sbSoftPink px-4 sm:px-6 md:px-8 py-6 sm:py-8">
-      <div className="max-w-md mx-auto space-y-6">
-        {title && (
-          <div className="space-y-2 text-center">
-            <motion.h1
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-2xl sm:text-3xl font-bold text-sbRichBlack"
-            >
-              {title}
-            </motion.h1>
-            {subtitle && (
-              <motion.p
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-sm sm:text-base text-sbRichBlack/80"
-              >
-                {subtitle}
-              </motion.p>
-            )}
-          </div>
-        )}
-        {children}
-      </div>
+    <div className={clsx("relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-28 pt-10", className)}>
+      <header className="mb-6 text-sbTextDark">
+        <p className="text-[11px] uppercase tracking-[0.4em] text-sbPinkDeep/70">{eyebrow}</p>
+        {title && <h1 className="mt-2 text-3xl font-semibold text-sbTextDark">{title}</h1>}
+        {subtitle && <p className="mt-1 text-sm text-sbTextDark/70">{subtitle}</p>}
+        {actions && <div className="mt-4">{actions}</div>}
+      </header>
+      <div className="flex-1 space-y-6 pb-4">{children}</div>
     </div>
   );
 }

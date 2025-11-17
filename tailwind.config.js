@@ -1,26 +1,21 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}"
-  ],
+  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        sbBackground: "#FFF4F7",
-        sbSoftPink: "#FFD9DE",
-        sbRoseQuartz: "#F4CCD4",
-        sbPrimaryRed: "#E63946",
+        sbPinkLight: "#FFEFF4",
+        sbPink: "#FFC9D9",
+        sbPinkDeep: "#FF9BB8",
+        sbRed: "#FF4B6E",
+        sbTextDark: "#222222",
         sbCard: "#FFFFFF",
-        sbSoftGrey: "#F0F0F0",
-        sbRichBlack: "#141414"
+        sbGrey: "#F5F5F7",
       },
       boxShadow: {
-        card: "0 8px 18px rgba(0,0,0,0.08)",
-        float: "0 4px 10px rgba(0,0,0,0.18)",
-        primary: "0 8px 14px rgba(230,57,70,0.35)"
-      }
-    }
+        card: "0 20px 40px rgba(255,75,110,0.25)",
+      },
+    },
   },
-  plugins: []
+  plugins: [],
 };
